@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 const topAnime = [{
     "mal_id": 52991,
@@ -85,72 +86,82 @@ const Game = () => {
   }
 
   return (
-    <View style={styles.container}>
-      {gameOver ? (
-        <View>
-          <Text style={styles.gameOverText}>Game Over! Your score: {score}</Text>
-          <TouchableOpacity style={styles.button} onPress={restartGame}>
-            <Text style={styles.buttonText}>Play Again</Text>
-          </TouchableOpacity>
+    <SafeAreaProvider>
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.container}>
+          {gameOver ? (
+            <View>
+              <Text style={styles.gameOverText}>Game Over! Your score: {score}</Text>
+              <TouchableOpacity style={styles.button} onPress={restartGame}>
+                <Text style={styles.buttonText}>Play Again</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <View>
+              <View style={styles.animeContainer}>
+                <Text style={styles.animeText}>{currentAnime.title}</Text>
+                <Image
+                  source={{ uri: currentAnime.image_url }}
+                  style={styles.animeImage}
+                />
+                <Text style={styles.scoreText}>Score: {score}</Text>
+              </View>
+              <View style={styles.buttonsContainer}>
+                <TouchableOpacity style={styles.button} onPress={() => handleGuess('higher')}>
+                  <Text style={styles.buttonText}>Higher</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.button} onPress={() => handleGuess('lower')}>
+                  <Text style={styles.buttonText}>Lower</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.animeContainer}>
+                <Text style={styles.animeText}>{nextAnime.title}</Text>
+                <Image
+                  source={{ uri: nextAnime.image_url }}
+                  style={styles.animeImage}
+                />
+              </View>
+            </View>
+          )}
         </View>
-      ) : (
-        <View>
-          <View style={styles.animeContainer}>
-            <Image
-              source={{ uri: currentAnime.image_url }}
-              style={styles.animeImage}
-            />
-            <Text style={styles.animeText}>Current Anime: {currentAnime.title}</Text>
-            <Text style={styles.scoreText}>Score: {score}</Text>
-          </View>
-          <View style={styles.buttonsContainer}>
-            <TouchableOpacity style={styles.button} onPress={() => handleGuess('higher')}>
-              <Text style={styles.buttonText}>Higher</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={() => handleGuess('lower')}>
-              <Text style={styles.buttonText}>Lower</Text>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.animeContainer}>
-            <Image
-              source={{ uri: nextAnime.image_url }}
-              style={styles.animeImage}
-            />
-            <Text style={styles.animeText}>Next Anime: {nextAnime.title}</Text>
-          </View>
-        </View>
-      )}
-    </View>
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#f8f8f8',
+  },
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f8f8f8',
     padding: 20,
   },
   animeContainer: {
     alignItems: 'center',
-    marginVertical: 20,
   },
   animeImage: {
     width: 200,
     height: 300,
     resizeMode: 'cover',
     borderRadius: 10,
-    marginBottom: 10,
   },
   animeText: {
     fontSize: 22,
     textAlign: 'center',
-    marginVertical: 10,
+    position: 'absolute',
+    top: 100,
+    color: '#fff',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    padding: 5,
+    borderRadius: 5,
+    zIndex: 10,
   },
   scoreText: {
     fontSize: 18,
-    marginVertical: 10,
   },
   buttonsContainer: {
     flexDirection: 'row',
