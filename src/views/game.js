@@ -1,47 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-
-const topAnime = [{
-    "mal_id": 52991,
-    "image_url": "https://cdn.myanimelist.net/images/anime/1015/138006.webp",
-    "title": "Sousou no Frieren",
-    "type": "TV",
-    "score": 9.35,
-    "popularity": 247
-},
-{
-    "mal_id": 5114,
-    "image_url": "https://cdn.myanimelist.net/images/anime/1208/94745.webp",
-    "title": "Fullmetal Alchemist: Brotherhood",
-    "type": "TV",
-    "score": 9.09,
-    "popularity": 3
-},
-{
-    "mal_id": 9253,
-    "image_url": "https://cdn.myanimelist.net/images/anime/1935/127974.webp",
-    "title": "Steins;Gate",
-    "type": "TV",
-    "score": 9.07,
-    "popularity": 13
-},
-{
-    "mal_id": 28977,
-    "image_url": "https://cdn.myanimelist.net/images/anime/3/72078.webp",
-    "title": "Gintama\u00b0",
-    "type": "TV",
-    "score": 9.06,
-    "popularity": 342
-},
-{
-    "mal_id": 38524,
-    "image_url": "https://cdn.myanimelist.net/images/anime/1517/100633.webp",
-    "title": "Shingeki no Kyojin Season 3 Part 2",
-    "type": "TV",
-    "score": 9.05,
-    "popularity": 21
-}]
+import topAnime from '../../assets/top_1000_anime.json'
 
 const getRandomAnime = (animeList, excludeId) => {
   const filteredList = animeList.filter(anime => anime.mal_id !== excludeId);
@@ -61,10 +21,10 @@ const Game = () => {
     setNextAnime(getRandomAnime(topAnime, initialAnime.mal_id));
   }, []);
 
-  const handleGuess = (guess) => {
-    const isHigher = nextAnime.score > currentAnime.score;
+  const handleGuess = (isHigher) => {
+    const isCorrect = nextAnime.score > currentAnime.score;
 
-    if ((guess === 'higher' && isHigher) || (guess === 'lower' && !isHigher)) {
+    if (isHigher === isCorrect) {
       setScore(score + 1);
       setCurrentAnime(nextAnime);
       setNextAnime(getRandomAnime(topAnime, nextAnime.mal_id));
@@ -100,26 +60,22 @@ const Game = () => {
             <View>
               <View style={styles.animeContainer}>
                 <Text style={styles.animeText}>{currentAnime.title}</Text>
-                <Image
-                  source={{ uri: currentAnime.image_url }}
-                  style={styles.animeImage}
-                />
+                <TouchableOpacity onPress={() => handleGuess(false)}>
+                  <Image
+                    source={{ uri: currentAnime.image_url }}
+                    style={styles.animeImage}
+                  />
+                </TouchableOpacity>
                 <Text style={styles.scoreText}>Score: {score}</Text>
-              </View>
-              <View style={styles.buttonsContainer}>
-                <TouchableOpacity style={styles.button} onPress={() => handleGuess('higher')}>
-                  <Text style={styles.buttonText}>Higher</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.button} onPress={() => handleGuess('lower')}>
-                  <Text style={styles.buttonText}>Lower</Text>
-                </TouchableOpacity>
               </View>
               <View style={styles.animeContainer}>
                 <Text style={styles.animeText}>{nextAnime.title}</Text>
-                <Image
-                  source={{ uri: nextAnime.image_url }}
-                  style={styles.animeImage}
-                />
+                <TouchableOpacity onPress={() => handleGuess(true)}>
+                  <Image
+                    source={{ uri: nextAnime.image_url }}
+                    style={styles.animeImage}
+                  />
+                </TouchableOpacity>
               </View>
             </View>
           )}
@@ -142,6 +98,7 @@ const styles = StyleSheet.create({
   },
   animeContainer: {
     alignItems: 'center',
+    marginBottom: 20,
   },
   animeImage: {
     width: 200,
@@ -162,12 +119,7 @@ const styles = StyleSheet.create({
   },
   scoreText: {
     fontSize: 18,
-  },
-  buttonsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    width: '100%',
-    marginVertical: 20,
+    marginTop: 10,
   },
   button: {
     padding: 15,
@@ -182,6 +134,7 @@ const styles = StyleSheet.create({
   gameOverText: {
     fontSize: 24,
     marginBottom: 20,
+    textAlign: 'center',
   },
 });
 
