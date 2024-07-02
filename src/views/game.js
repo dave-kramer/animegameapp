@@ -4,6 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import topAnime from '../../assets/top_1000_anime.json';
 import topManga from '../../assets/top_1000_manga.json';
 import topChar from '../../assets/top_1000_char.json';
+import { CountUp } from 'use-count-up'
 
 const getRandomItem = (list, excludeId = null) => {
   const filteredList = excludeId ? list.filter(item => item.mal_id !== excludeId) : list;
@@ -149,7 +150,17 @@ const Game = ({ route }) => {
               <View style={lastGuessCorrect ? styles.overlayGreen : styles.overlayRed} />
             )}
             <Text style={styles.itemText}>{option === 'Character Favorites' ? currentItem.name : currentItem.title}</Text>
-            {showScores && <Text style={styles.scoreTextOverlay}>{option.includes('Score') ? `Score: ${currentItem.score}` : option.includes('Popularity') ? `Popularity: ${currentItem.popularity}` : `Favorites: ${currentItem.favorites}`}</Text>}
+            {showScores && (
+              <Text style={styles.scoreTextOverlay}>
+               {option.includes('Score') ? (
+              <CountUp isCounting start={Number((currentItem.score * 0.8).toFixed(2))} end={currentItem.score} duration={1} />
+            ) : option.includes('Popularity') ? (
+              <CountUp isCounting  end={currentItem.popularity} duration={1.5} />
+            ) : (
+              <CountUp isCounting end={currentItem.favorites} duration={1.5} />
+            )}
+              </Text>
+            )}
           </TouchableOpacity>
           <View style={styles.divider} />
           <TouchableOpacity
@@ -164,7 +175,17 @@ const Game = ({ route }) => {
               <View style={lastGuessCorrect ? styles.overlayGreen : styles.overlayRed} />
             )}
             <Text style={styles.itemText}>{option === 'Character Favorites' ? nextItem.name : nextItem.title}</Text>
-            {showScores && <Text style={styles.scoreTextOverlay}>{option.includes('Score') ? `Score: ${nextItem.score}` : option.includes('Popularity') ? `Popularity: ${nextItem.popularity}` : `Favorites: ${nextItem.favorites}`}</Text>}
+            {showScores && (
+              <Text style={styles.scoreTextOverlay}>
+                {option.includes('Score') ? (
+              <CountUp isCounting start={Number((nextItem.score * 0.8).toFixed(2))} end={nextItem.score} duration={1} />
+            ) : option.includes('Popularity') ? (
+              <CountUp isCounting end={nextItem.popularity} duration={1.5} />
+            ) : (
+              <CountUp isCounting end={nextItem.favorites} duration={1.5} />
+            )}
+              </Text>
+            )}
           </TouchableOpacity>
         </View>
       )}
@@ -204,6 +225,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
     textAlign: 'center',
     position: 'absolute',
+    justifyContent: 'center',
     color: '#fff',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     padding: 5,
@@ -212,9 +234,9 @@ const styles = StyleSheet.create({
   scoreTextOverlay: {
     fontSize: 18,
     textAlign: 'center',
-    position: 'absolute',
     color: '#fff',
-    bottom: 10,
+    position: 'absolute',
+    bottom: 85,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     padding: 5,
     borderRadius: 5,
