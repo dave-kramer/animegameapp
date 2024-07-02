@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import topAnime from '../../assets/top_1000_anime.json';
 import topManga from '../../assets/top_1000_manga.json';
 import topChar from '../../assets/top_1000_char.json';
-import { CountUp } from 'use-count-up'
+import { CountUp } from 'use-count-up';
 
 const getRandomItem = (list, excludeId = null) => {
   const filteredList = excludeId ? list.filter(item => item.mal_id !== excludeId) : list;
@@ -24,6 +24,7 @@ const Game = ({ route }) => {
   const [scoreContainerColor, setScoreContainerColor] = useState('#298acd');
   const [lastGuessCorrect, setLastGuessCorrect] = useState(null);
   const [lastImagePressed, setLastImagePressed] = useState(null);
+  const [gameOverGif, setGameOverGif] = useState(null);
 
   useEffect(() => {
     const loadHighScore = async () => {
@@ -50,6 +51,22 @@ const Game = ({ route }) => {
     setCurrentItem(initialItem);
     setNextItem(getRandomItem(option === 'Character Favorites' ? topChar : (option.includes('Anime') ? topAnime : topManga), initialItem.mal_id));
   }, [option]);
+
+  useEffect(() => {
+    const fetchGameOverGif = async () => {
+      try {
+        const response = await fetch('https://api.otakugifs.xyz/gif?reaction=sad');
+        const data = await response.json();
+        setGameOverGif(data.url);
+      } catch (error) {
+        console.error('Failed to fetch game over GIF:', error);
+      }
+    };
+
+    if (gameOver) {
+      fetchGameOverGif();
+    }
+  }, [gameOver]);
 
   const saveHighScore = async (newHighScore) => {
     try {
@@ -126,6 +143,7 @@ const Game = ({ route }) => {
     <View style={styles.container}>
       {gameOver ? (
         <View style={styles.gameOverContainer}>
+          {gameOverGif && <Image source={{ uri: gameOverGif }} style={{ width: 200, height: 200 }} />}
           <Text style={styles.gameOverText}>Game Over!</Text>
           <Text style={styles.gameOverText}>Your score: {score}</Text>
           <Text style={styles.gameOverText}>High Score: {highScore}</Text>
@@ -152,13 +170,13 @@ const Game = ({ route }) => {
             <Text style={styles.itemText}>{option === 'Character Favorites' ? currentItem.name : currentItem.title}</Text>
             {showScores && (
               <Text style={styles.scoreTextOverlay}>
-               {option.includes('Score') ? (
-              <CountUp isCounting start={Number((currentItem.score * 0.8).toFixed(2))} end={currentItem.score} duration={1} />
-            ) : option.includes('Popularity') ? (
-              <CountUp isCounting  end={currentItem.popularity} duration={1.5} />
-            ) : (
-              <CountUp isCounting end={currentItem.favorites} duration={1.5} />
-            )}
+                {option.includes('Score') ? (
+                  <CountUp isCounting start={Number((currentItem.score * 0.8).toFixed(2))} end={currentItem.score} duration={1} />
+                ) : option.includes('Popularity') ? (
+                  <CountUp isCounting end={currentItem.popularity} duration={1.5} />
+                ) : (
+                  <CountUp isCounting end={currentItem.favorites} duration={1.5} />
+                )}
               </Text>
             )}
           </TouchableOpacity>
@@ -178,12 +196,12 @@ const Game = ({ route }) => {
             {showScores && (
               <Text style={styles.scoreTextOverlay}>
                 {option.includes('Score') ? (
-              <CountUp isCounting start={Number((nextItem.score * 0.8).toFixed(2))} end={nextItem.score} duration={1} />
-            ) : option.includes('Popularity') ? (
-              <CountUp isCounting end={nextItem.popularity} duration={1.5} />
-            ) : (
-              <CountUp isCounting end={nextItem.favorites} duration={1.5} />
-            )}
+                  <CountUp isCounting start={Number((nextItem.score * 0.8).toFixed(2))} end={nextItem.score} duration={1} />
+                ) : option.includes('Popularity') ? (
+                  <CountUp isCounting end={nextItem.popularity} duration={1.5} />
+                ) : (
+                  <CountUp isCounting end={nextItem.favorites} duration={1.5} />
+                )}
               </Text>
             )}
           </TouchableOpacity>
