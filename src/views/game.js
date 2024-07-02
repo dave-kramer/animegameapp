@@ -2,16 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import topAnime from '../../assets/top_1000_anime.json';
+import topManga from '../../assets/top_1000_manga.json';
+import topChar from '../../assets/top_1000_char.json';
 
-const getRandomAnime = (animeList, excludeId) => {
-  const filteredList = animeList.filter(anime => anime.mal_id !== excludeId);
+const getRandomItem = (list, excludeId = null) => {
+  const filteredList = excludeId ? list.filter(item => item.mal_id !== excludeId) : list;
   const randomIndex = Math.floor(Math.random() * filteredList.length);
   return filteredList[randomIndex];
 };
 
-const Game = () => {
-  const [currentAnime, setCurrentAnime] = useState(null);
-  const [nextAnime, setNextAnime] = useState(null);
+const Game = ({ route }) => {
+  const { option } = route.params;
+  const [currentItem, setCurrentItem] = useState(null);
+  const [nextItem, setNextItem] = useState(null);
   const [score, setScore] = useState(0);
   const [highScore, setHighScore] = useState(0);
   const [gameOver, setGameOver] = useState(false);
@@ -24,7 +27,7 @@ const Game = () => {
   useEffect(() => {
     const loadHighScore = async () => {
       try {
-        const savedHighScore = await AsyncStorage.getItem('highScore');
+        const savedHighScore = await AsyncStorage.getItem(`highScore-${option}`);
         if (savedHighScore !== null) {
           setHighScore(parseInt(savedHighScore, 10));
         }
@@ -35,21 +38,36 @@ const Game = () => {
 
     loadHighScore();
 
-    const initialAnime = getRandomAnime(topAnime);
-    setCurrentAnime(initialAnime);
-    setNextAnime(getRandomAnime(topAnime, initialAnime.mal_id));
-  }, []);
+    let initialItem;
+    if (option === 'Anime Score' || option === 'Anime Popularity') {
+      initialItem = getRandomItem(topAnime);
+    } else if (option === 'Manga Score' || option === 'Manga Popularity') {
+      initialItem = getRandomItem(topManga);
+    } else if (option === 'Character Favorites') {
+      initialItem = getRandomItem(topChar);
+    }
+    setCurrentItem(initialItem);
+    setNextItem(getRandomItem(option === 'Character Favorites' ? topChar : (option.includes('Anime') ? topAnime : topManga), initialItem.mal_id));
+  }, [option]);
 
   const saveHighScore = async (newHighScore) => {
     try {
-      await AsyncStorage.setItem('highScore', newHighScore.toString());
+      await AsyncStorage.setItem(`highScore-${option}`, newHighScore.toString());
     } catch (error) {
       console.error('Failed to save high score:', error);
     }
   };
 
   const handleGuess = (isHigher, pressedImage) => {
-    const isCorrect = nextAnime.score > currentAnime.score;
+    let isCorrect;
+    if (option.includes('Score')) {
+      isCorrect = nextItem.score > currentItem.score;
+    } else if (option.includes('Popularity')) {
+      isCorrect = nextItem.popularity < currentItem.popularity;
+    } else if (option === 'Character Favorites') {
+      isCorrect = nextItem.favorites > currentItem.favorites;
+    }
+
     setLastGuessCorrect(isHigher === isCorrect);
     setLastImagePressed(pressedImage);
 
@@ -65,8 +83,8 @@ const Game = () => {
 
     setTimeout(() => {
       if (isHigher === isCorrect) {
-        setCurrentAnime(nextAnime);
-        setNextAnime(getRandomAnime(topAnime, nextAnime.mal_id));
+        setCurrentItem(nextItem);
+        setNextItem(getRandomItem(option === 'Character Favorites' ? topChar : (option.includes('Anime') ? topAnime : topManga), nextItem.mal_id));
       } else {
         setGameOver(true);
         if (score > highScore) {
@@ -82,9 +100,16 @@ const Game = () => {
   };
 
   const restartGame = () => {
-    const initialAnime = getRandomAnime(topAnime);
-    setCurrentAnime(initialAnime);
-    setNextAnime(getRandomAnime(topAnime, initialAnime.mal_id));
+    let initialItem;
+    if (option === 'Anime Score' || option === 'Anime Popularity') {
+      initialItem = getRandomItem(topAnime);
+    } else if (option === 'Manga Score' || option === 'Manga Popularity') {
+      initialItem = getRandomItem(topManga);
+    } else if (option === 'Character Favorites') {
+      initialItem = getRandomItem(topChar);
+    }
+    setCurrentItem(initialItem);
+    setNextItem(getRandomItem(option === 'Character Favorites' ? topChar : (option.includes('Anime') ? topAnime : topManga), initialItem.mal_id));
     setScore(0);
     setGameOver(false);
     setShowScores(false);
@@ -92,7 +117,7 @@ const Game = () => {
     setLastGuessCorrect(null);
   };
 
-  if (!currentAnime || !nextAnime) {
+  if (!currentItem || !nextItem) {
     return <Text>Loading...</Text>;
   }
 
@@ -113,33 +138,33 @@ const Game = () => {
             <Text style={styles.scoreText}>{score}</Text>
           </View>
           <TouchableOpacity
-            style={styles.animeContainer}
+            style={styles.itemContainer}
             onPress={() => !imagePressed && handleGuess(false, 'current')}
           >
             <Image
-              source={{ uri: currentAnime.image_url }}
-              style={styles.animeImage}
+              source={{ uri: currentItem.image_url }}
+              style={styles.itemImage}
             />
             {imagePressed && lastImagePressed === 'current' && (
               <View style={lastGuessCorrect ? styles.overlayGreen : styles.overlayRed} />
             )}
-            <Text style={styles.animeText}>{currentAnime.title}</Text>
-            {showScores && <Text style={styles.scoreTextOverlay}>Score: {currentAnime.score}</Text>}
+            <Text style={styles.itemText}>{option === 'Character Favorites' ? currentItem.name : currentItem.title}</Text>
+            {showScores && <Text style={styles.scoreTextOverlay}>{option.includes('Score') ? `Score: ${currentItem.score}` : option.includes('Popularity') ? `Popularity: ${currentItem.popularity}` : `Favorites: ${currentItem.favorites}`}</Text>}
           </TouchableOpacity>
           <View style={styles.divider} />
           <TouchableOpacity
-            style={styles.animeContainer}
+            style={styles.itemContainer}
             onPress={() => !imagePressed && handleGuess(true, 'next')}
           >
             <Image
-              source={{ uri: nextAnime.image_url }}
-              style={styles.animeImage}
+              source={{ uri: nextItem.image_url }}
+              style={styles.itemImage}
             />
             {imagePressed && lastImagePressed === 'next' && (
               <View style={lastGuessCorrect ? styles.overlayGreen : styles.overlayRed} />
             )}
-            <Text style={styles.animeText}>{nextAnime.title}</Text>
-            {showScores && <Text style={styles.scoreTextOverlay}>Score: {nextAnime.score}</Text>}
+            <Text style={styles.itemText}>{option === 'Character Favorites' ? nextItem.name : nextItem.title}</Text>
+            {showScores && <Text style={styles.scoreTextOverlay}>{option.includes('Score') ? `Score: ${nextItem.score}` : option.includes('Popularity') ? `Popularity: ${nextItem.popularity}` : `Favorites: ${nextItem.favorites}`}</Text>}
           </TouchableOpacity>
         </View>
       )}
@@ -156,13 +181,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  animeContainer: {
+  itemContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     width: '100%',
   },
-  animeImage: {
+  itemImage: {
     width: '100%',
     height: '100%',
     resizeMode: 'cover',
@@ -175,7 +200,7 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0, 255, 0, 0.2)',
   },
-  animeText: {
+  itemText: {
     fontSize: 22,
     textAlign: 'center',
     position: 'absolute',

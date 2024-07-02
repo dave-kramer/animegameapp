@@ -1,3 +1,5 @@
+// Menu.js
+
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal } from 'react-native';
 
@@ -10,8 +12,11 @@ const Menu = ({ navigation }) => {
 
   const handleOptionPress = (option) => {
     setModalVisible(false);
-    // Navigate to the Game screen with the chosen option
     navigation.navigate('Game', { option });
+  };
+
+  const handleInformationPress = () => {
+    navigation.navigate('Information');
   };
 
   return (
@@ -22,7 +27,7 @@ const Menu = ({ navigation }) => {
       <TouchableOpacity style={styles.menuItem}>
         <Text style={styles.menuText}>Guess the ...</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.menuItem}>
+      <TouchableOpacity style={styles.menuItem} onPress={handleInformationPress}>
         <Text style={styles.menuText}>Information</Text>
       </TouchableOpacity>
 
@@ -37,31 +42,31 @@ const Menu = ({ navigation }) => {
             <Text style={styles.modalTitle}>Choose an Option</Text>
             <TouchableOpacity
               style={styles.modalOption}
-              onPress={() => handleOptionPress('Score')}
+              onPress={() => handleOptionPress('Anime Score')}
             >
               <Text style={styles.modalOptionText}>Anime Score</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.modalOption}
-              onPress={() => handleOptionPress('Popularity')}
+              onPress={() => handleOptionPress('Anime Popularity')}
             >
               <Text style={styles.modalOptionText}>Anime Popularity</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.modalOption}
-              onPress={() => handleOptionPress('Score')}
+              onPress={() => handleOptionPress('Manga Score')}
             >
               <Text style={styles.modalOptionText}>Manga Score</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.modalOption}
-              onPress={() => handleOptionPress('Popularity')}
+              onPress={() => handleOptionPress('Manga Popularity')}
             >
               <Text style={styles.modalOptionText}>Manga Popularity</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.modalOption}
-              onPress={() => handleOptionPress('Popularity')}
+              onPress={() => handleOptionPress('Character Favorites')}
             >
               <Text style={styles.modalOptionText}>Character Favorites</Text>
             </TouchableOpacity>
