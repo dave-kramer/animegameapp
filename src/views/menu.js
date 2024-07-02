@@ -1,10 +1,9 @@
-// Menu.js
-
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal } from 'react-native';
 
 const Menu = ({ navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
+  const [guessModalVisible, setGuessModalVisible] = useState(false);
 
   const handleHigherOrLowerPress = () => {
     setModalVisible(true);
@@ -19,12 +18,21 @@ const Menu = ({ navigation }) => {
     navigation.navigate('Information');
   };
 
+  const handleGuessPress = () => {
+    setGuessModalVisible(true);
+  };
+
+  const handleGuessOptionPress = (option) => {
+    setGuessModalVisible(false);
+    navigation.navigate('Guess', { guessType: option });
+  };
+
   return (
     <View style={styles.container}>
       <TouchableOpacity style={styles.menuItem} onPress={handleHigherOrLowerPress}>
         <Text style={styles.menuText}>Higher or Lower</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.menuItem}>
+      <TouchableOpacity style={styles.menuItem} onPress={handleGuessPress}>
         <Text style={styles.menuText}>Guess the ...</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.menuItem} onPress={handleInformationPress}>
@@ -73,6 +81,43 @@ const Menu = ({ navigation }) => {
             <TouchableOpacity
               style={styles.closeButton}
               onPress={() => setModalVisible(false)}
+            >
+              <Text style={styles.closeButtonText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        transparent={true}
+        visible={guessModalVisible}
+        animationType="slide"
+        onRequestClose={() => setGuessModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Guess the Character</Text>
+            <TouchableOpacity
+              style={styles.modalOption}
+              onPress={() => handleGuessOptionPress('name')}
+            >
+              <Text style={styles.modalOptionText}>Name</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.modalOption}
+              onPress={() => handleGuessOptionPress('nicknames')}
+            >
+              <Text style={styles.modalOptionText}>Nicknames</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.modalOption}
+              onPress={() => handleGuessOptionPress('name_kanji')}
+            >
+              <Text style={styles.modalOptionText}>Name Kanji</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setGuessModalVisible(false)}
             >
               <Text style={styles.closeButtonText}>Close</Text>
             </TouchableOpacity>

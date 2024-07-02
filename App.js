@@ -4,6 +4,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import Menu from './src/views/menu';
 import Game from './src/views/game';
+import Guess from './src/views/guess';
 import Information from './src/views/information';
 
 const Stack = createStackNavigator();
@@ -14,6 +15,7 @@ const App = () => {
         <Stack.Navigator initialRouteName="Menu">
           <Stack.Screen name="Menu" component={Menu} />
           <Stack.Screen name="Game" component={Game} options={{ headerShown: false }}/>
+          <Stack.Screen name="Guess" component={Guess} options={{ headerShown: false }}/>
           <Stack.Screen name="Information" component={Information} />
         </Stack.Navigator>
       </NavigationContainer>
