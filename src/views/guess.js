@@ -60,7 +60,6 @@ const Guess = ({ route }) => {
         if (guessType === 'name') {
             correctAnswer = currentCharacter.name;
         } else if (guessType === 'nicknames') {
-            // Choose a random nickname from the current character's list
             const randomIndex = Math.floor(Math.random() * currentCharacter.nicknames.length);
             correctAnswer = currentCharacter.nicknames[randomIndex];
         } else {
@@ -78,7 +77,6 @@ const Guess = ({ route }) => {
             handleGameOver();
         }
     };
-
 
     const handleGameOver = async () => {
         if (currentScore > highScore) {
@@ -115,7 +113,12 @@ const Guess = ({ route }) => {
 
     return (
         <View style={styles.container}>
-            <Image source={{ uri: currentCharacter.image_url }} style={styles.characterImage} />
+            <View style={styles.card}>
+                <Image source={{ uri: currentCharacter.image_url }} style={styles.characterImage} />
+                <View style={styles.scoreCircle}>
+                    <Text style={styles.scoreText}>{currentScore}</Text>
+                </View>
+            </View>
             <View style={styles.optionsContainer}>
                 {options.map((option) => (
                     <TouchableOpacity
@@ -134,7 +137,6 @@ const Guess = ({ route }) => {
                         </Text>
                     </TouchableOpacity>
                 ))}
-
             </View>
         </View>
     );
@@ -147,10 +149,48 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#f8f8f8',
     },
+    card: {
+        width: 220,
+        height: 320,
+        marginBottom: 20,
+        padding: 10,
+        borderRadius: 10,
+        backgroundColor: '#fff',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
+        alignItems: 'center',
+        justifyContent: 'center',
+        position: 'relative',
+    },
     characterImage: {
         width: 200,
         height: 300,
-        marginBottom: 20,
+        borderRadius: 10,
+    },
+    scoreCircle: {
+        position: 'absolute',
+        bottom: -20,
+        width: 50,
+        height: 50,
+        borderRadius: 25,
+        backgroundColor: '#007bff',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 2,
+        borderColor: '#fff',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
+    },
+    scoreText: {
+        color: '#fff',
+        fontSize: 18,
+        fontWeight: 'bold',
     },
     optionsContainer: {
         width: '80%',
@@ -186,5 +226,6 @@ const styles = StyleSheet.create({
         fontSize: 18,
     },
 });
+
 
 export default Guess;

@@ -21,10 +21,11 @@ const Game = ({ route }) => {
   const [gameOver, setGameOver] = useState(false);
   const [showScores, setShowScores] = useState(false);
   const [imagePressed, setImagePressed] = useState(false);
-  const [scoreContainerColor, setScoreContainerColor] = useState('#298acd');
+  const [scoreContainerColor, setScoreContainerColor] = useState('#007bff');
   const [lastGuessCorrect, setLastGuessCorrect] = useState(null);
   const [lastImagePressed, setLastImagePressed] = useState(null);
   const [gameOverGif, setGameOverGif] = useState(null);
+  const [countUpComplete, setCountUpComplete] = useState(false);
   const [showPlusOne, setShowPlusOne] = useState(false);
 
   const plusOnePosition = useRef(new Animated.Value(0)).current;
@@ -96,11 +97,31 @@ const Game = ({ route }) => {
     setShowScores(true);
     setImagePressed(true);
 
-    if (isHigher === isCorrect) {
-      setScore(score + 1);
+    setTimeout(() => {
+      if (isHigher === isCorrect) {
+        setScore(score + 1);
+        setCurrentItem(nextItem);
+        setNextItem(getRandomItem(option === 'Character Favorites' ? topChar : (option.includes('Anime') ? topAnime : topManga), nextItem.mal_id));
+      } else {
+        setGameOver(true);
+        if (score > highScore) {
+          setHighScore(score);
+          saveHighScore(score);
+        }
+      }
+      setShowScores(false);
+      setImagePressed(false);
+      setScoreContainerColor('#298acd');
+      setLastImagePressed(null);
+      setCountUpComplete(false);
+    }, 2500);
+  };
+
+  useEffect(() => {
+    if (countUpComplete && lastGuessCorrect) {
       setScoreContainerColor('green');
       setShowPlusOne(true);
-
+  
       Animated.parallel([
         Animated.timing(plusOnePosition, {
           toValue: -30,
@@ -117,27 +138,10 @@ const Game = ({ route }) => {
         plusOnePosition.setValue(0);
         plusOneOpacity.setValue(1);
       });
-    } else {
+    } else if (countUpComplete) {
       setScoreContainerColor('red');
     }
-
-    setTimeout(() => {
-      if (isHigher === isCorrect) {
-        setCurrentItem(nextItem);
-        setNextItem(getRandomItem(option === 'Character Favorites' ? topChar : (option.includes('Anime') ? topAnime : topManga), nextItem.mal_id));
-      } else {
-        setGameOver(true);
-        if (score > highScore) {
-          setHighScore(score);
-          saveHighScore(score);
-        }
-      }
-      setShowScores(false);
-      setImagePressed(false);
-      setScoreContainerColor('#298acd');
-      setLastImagePressed(null);
-    }, 2500);
-  };
+  }, [countUpComplete, lastGuessCorrect]);
 
   const restartGame = () => {
     let initialItem;
@@ -155,6 +159,7 @@ const Game = ({ route }) => {
     setShowScores(false);
     setScoreContainerColor('#298acd');
     setLastGuessCorrect(null);
+    setCountUpComplete(false);
   };
 
   if (!currentItem || !nextItem) {
@@ -191,18 +196,34 @@ const Game = ({ route }) => {
               source={{ uri: currentItem.image_url }}
               style={styles.itemImage}
             />
-            {imagePressed && lastImagePressed === 'current' && (
+            {imagePressed && lastImagePressed === 'current' && countUpComplete && (
               <View style={lastGuessCorrect ? styles.overlayGreen : styles.overlayRed} />
             )}
             <Text style={styles.itemText}>{option === 'Character Favorites' ? currentItem.name : currentItem.title}</Text>
             {showScores && (
               <Text style={styles.scoreTextOverlay}>
                 {option.includes('Score') ? (
-                  <CountUp isCounting start={Number((currentItem.score * 0.8).toFixed(2))} end={currentItem.score} duration={1} />
+                  <CountUp
+                    isCounting
+                    start={Number((currentItem.score * 0.8).toFixed(2))}
+                    end={currentItem.score}
+                    duration={1}
+                    onComplete={() => setCountUpComplete(true)}
+                  />
                 ) : option.includes('Popularity') ? (
-                  <CountUp isCounting end={currentItem.popularity} duration={1.5} />
+                  <CountUp
+                    isCounting
+                    end={currentItem.popularity}
+                    duration={1.5}
+                    onComplete={() => setCountUpComplete(true)}
+                  />
                 ) : (
-                  <CountUp isCounting end={currentItem.favorites} duration={1.5} />
+                  <CountUp
+                    isCounting
+                    end={currentItem.favorites}
+                    duration={1.5}
+                    onComplete={() => setCountUpComplete(true)}
+                  />
                 )}
               </Text>
             )}
@@ -216,18 +237,34 @@ const Game = ({ route }) => {
               source={{ uri: nextItem.image_url }}
               style={styles.itemImage}
             />
-            {imagePressed && lastImagePressed === 'next' && (
+            {imagePressed && lastImagePressed === 'next' && countUpComplete && (
               <View style={lastGuessCorrect ? styles.overlayGreen : styles.overlayRed} />
             )}
             <Text style={styles.itemText}>{option === 'Character Favorites' ? nextItem.name : nextItem.title}</Text>
             {showScores && (
               <Text style={styles.scoreTextOverlay}>
                 {option.includes('Score') ? (
-                  <CountUp isCounting start={Number((nextItem.score * 0.8).toFixed(2))} end={nextItem.score} duration={1} />
+                  <CountUp
+                    isCounting
+                    start={Number((nextItem.score * 0.8).toFixed(2))}
+                    end={nextItem.score}
+                    duration={1}
+                    onComplete={() => setCountUpComplete(true)}
+                  />
                 ) : option.includes('Popularity') ? (
-                  <CountUp isCounting end={nextItem.popularity} duration={1.5} />
+                  <CountUp
+                    isCounting
+                    end={nextItem.popularity}
+                    duration={1.5}
+                    onComplete={() => setCountUpComplete(true)}
+                  />
                 ) : (
-                  <CountUp isCounting end={nextItem.favorites} duration={1.5} />
+                  <CountUp
+                    isCounting
+                    end={nextItem.favorites}
+                    duration={1.5}
+                    onComplete={() => setCountUpComplete(true)}
+                  />
                 )}
               </Text>
             )}
@@ -279,17 +316,18 @@ const styles = StyleSheet.create({
   scoreTextOverlay: {
     fontSize: 18,
     textAlign: 'center',
+    fontWeight: 'bold',
     color: '#fff',
     position: 'absolute',
     bottom: 85,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
     padding: 5,
     borderRadius: 5,
   },
   divider: {
     width: '100%',
-    height: 5,
-    backgroundColor: '#000',
+    height: 4,
+    backgroundColor: '#fff',
   },
   scoreContainer: {
     position: 'absolute',
@@ -299,6 +337,13 @@ const styles = StyleSheet.create({
     height: 60,
     borderRadius: 40,
     zIndex: 1,
+    borderWidth: 2,
+    borderColor: '#fff',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   scoreText: {
     fontSize: 24,

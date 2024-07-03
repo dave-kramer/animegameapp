@@ -40,6 +40,9 @@ const Menu = ({ navigation }) => {
           <Text style={styles.menuText}>Settings</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.menuItem}>
+          <Text style={styles.menuText}>Scores</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.menuItem}>
           <Text style={styles.menuText}>Rate us</Text>
         </TouchableOpacity>
 
