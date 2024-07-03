@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image, Animated } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import topAnime from '../../assets/top_1000_anime.json';
 import topManga from '../../assets/top_1000_manga.json';
@@ -25,6 +25,10 @@ const Game = ({ route }) => {
   const [lastGuessCorrect, setLastGuessCorrect] = useState(null);
   const [lastImagePressed, setLastImagePressed] = useState(null);
   const [gameOverGif, setGameOverGif] = useState(null);
+  const [showPlusOne, setShowPlusOne] = useState(false);
+
+  const plusOnePosition = useRef(new Animated.Value(0)).current;
+  const plusOneOpacity = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     const loadHighScore = async () => {
@@ -95,6 +99,24 @@ const Game = ({ route }) => {
     if (isHigher === isCorrect) {
       setScore(score + 1);
       setScoreContainerColor('green');
+      setShowPlusOne(true);
+
+      Animated.parallel([
+        Animated.timing(plusOnePosition, {
+          toValue: -30,
+          duration: 1250,
+          useNativeDriver: true,
+        }),
+        Animated.timing(plusOneOpacity, {
+          toValue: 0,
+          duration: 1250,
+          useNativeDriver: true,
+        }),
+      ]).start(() => {
+        setShowPlusOne(false);
+        plusOnePosition.setValue(0);
+        plusOneOpacity.setValue(1);
+      });
     } else {
       setScoreContainerColor('red');
     }
@@ -155,6 +177,11 @@ const Game = ({ route }) => {
         <View style={styles.gameContainer}>
           <View style={[styles.scoreContainer, { backgroundColor: scoreContainerColor }]}>
             <Text style={styles.scoreText}>{score}</Text>
+            {showPlusOne && (
+              <Animated.Text style={[styles.plusOneText, { transform: [{ translateY: plusOnePosition }], opacity: plusOneOpacity }]}>
+                +1
+              </Animated.Text>
+            )}
           </View>
           <TouchableOpacity
             style={styles.itemContainer}
@@ -276,6 +303,16 @@ const styles = StyleSheet.create({
   scoreText: {
     fontSize: 24,
     color: '#fff',
+  },
+  plusOneText: {
+    fontSize: 20,
+    color: '#fff',
+    position: 'absolute',
+    top: 20,
+    right: -35,
+    textShadowColor: '#000',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 1,
   },
   button: {
     padding: 15,
