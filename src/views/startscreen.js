@@ -13,6 +13,7 @@ const StartScreen = ({ navigation }) => {
         source={require('../../assets/12.png')}
         style={styles.background}
       >
+        <Animatable.View animation="pulse" iterationCount="infinite" iterationDelay={1000} style={styles.textContainer}>
           <Animatable.Text style={styles.text}>Click to play</Animatable.Text>
         </Animatable.View>
       </ImageBackground>
