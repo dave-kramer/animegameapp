@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import characters from '../../assets/top_1000_char.json';
+import { fetchGameOverGif } from '../utils/gifFetcher';
 
 const getRandomCharacters = (num, guessType) => {
     let filteredCharacters = characters;
@@ -31,6 +32,7 @@ const Guess = ({ route }) => {
     const [currentScore, setCurrentScore] = useState(0);
     const [highScore, setHighScore] = useState(0);
     const [gameOver, setGameOver] = useState(false);
+    const [gameOverGif, setGameOverGif] = useState(null);
 
     useEffect(() => {
         loadHighScore();
@@ -88,17 +90,21 @@ const Guess = ({ route }) => {
             }
         }
         setGameOver(true);
+        const gifUrl = fetchGameOverGif(); // No need to await as it's synchronous
+        setGameOverGif(gifUrl);
     };
 
     const restartGame = () => {
         setCurrentScore(0);
         setGameOver(false);
+        setGameOverGif(null);
         loadNewCharacter();
     };
 
     if (gameOver) {
         return (
             <View style={styles.gameOverContainer}>
+                {gameOverGif && <Image source={gameOverGif} style={styles.gameOverGif} />}
                 <Text style={styles.gameOverText}>Game Over!</Text>
                 <Text style={styles.gameOverText}>Your score: {currentScore}</Text>
                 <Text style={styles.gameOverText}>High Score: {highScore}</Text>
@@ -212,6 +218,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#f8f8f8',
     },
+    gameOverGif: {
+        width: 200,
+        height: 200,
+        marginBottom: 20,
+    },
     gameOverText: {
         fontSize: 24,
         marginBottom: 20,
@@ -226,6 +237,5 @@ const styles = StyleSheet.create({
         fontSize: 18,
     },
 });
-
 
 export default Guess;

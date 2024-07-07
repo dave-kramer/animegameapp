@@ -5,6 +5,7 @@ import topAnime from '../../assets/top_1000_anime.json';
 import topManga from '../../assets/top_1000_manga.json';
 import topChar from '../../assets/top_1000_char.json';
 import { CountUp } from 'use-count-up';
+import { fetchGameOverGif } from '../utils/gifFetcher';
 
 const getRandomItem = (list, excludeId = null) => {
   const filteredList = excludeId ? list.filter(item => item.mal_id !== excludeId) : list;
@@ -58,18 +59,9 @@ const Game = ({ route }) => {
   }, [option]);
 
   useEffect(() => {
-    const fetchGameOverGif = async () => {
-      try {
-        const response = await fetch('https://api.otakugifs.xyz/gif?reaction=sad');
-        const data = await response.json();
-        setGameOverGif(data.url);
-      } catch (error) {
-        console.error('Failed to fetch game over GIF:', error);
-      }
-    };
-
     if (gameOver) {
-      fetchGameOverGif();
+      const gifUrl = fetchGameOverGif();
+      setGameOverGif(gifUrl);
     }
   }, [gameOver]);
 
@@ -170,7 +162,7 @@ const Game = ({ route }) => {
     <View style={styles.container}>
       {gameOver ? (
         <View style={styles.gameOverContainer}>
-          {gameOverGif && <Image source={{ uri: gameOverGif }} style={{ width: 200, height: 200 }} />}
+          {gameOverGif && <Image source={gameOverGif} style={{ width: 200, height: 200 }} />}
           <Text style={styles.gameOverText}>Game Over!</Text>
           <Text style={styles.gameOverText}>Your score: {score}</Text>
           <Text style={styles.gameOverText}>High Score: {highScore}</Text>
