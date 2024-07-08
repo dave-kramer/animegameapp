@@ -8,6 +8,7 @@ import Game from './src/views/game';
 import Guess from './src/views/guess';
 import Rounds from './src/views/rounds';
 import Settings from './src/views/settings';
+import Score from './src/views/score';
 
 const Stack = createStackNavigator();
 
@@ -20,7 +21,8 @@ const App = () => {
         <Stack.Screen name="Game" component={Game} options={{ headerShown: false }}/>
         <Stack.Screen name="Guess" component={Guess} options={{ headerShown: false }}/>
         <Stack.Screen name="Rounds" component={Rounds} options={{ headerShown: false }}/>
-        <Stack.Screen name="Settings" component={Settings} />
+        <Stack.Screen name="Score" component={Score} options={{ headerShown: false }}/>
+        <Stack.Screen name="Settings" component={Settings}/>
       </Stack.Navigator>
     </NavigationContainer>
   );

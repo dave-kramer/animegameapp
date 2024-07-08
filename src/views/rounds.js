@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, Animated, Easing } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import characters from '../../assets/top_1000_char.json';
 
 const Rounds = ({ route }) => {
@@ -18,19 +19,28 @@ const Rounds = ({ route }) => {
     setCurrentPair([selected[0], selected[1]]);
   }, [gender, rounds]);
 
+  const saveWinnerToStorage = async (winner, gender) => {
+    const key = gender === 'Male' ? 'BestMale' : 'BestFemale';
+    try {
+      await AsyncStorage.setItem(key, JSON.stringify(winner));
+    } catch (error) {
+      console.error('Error saving winner to local storage:', error);
+    }
+  };
+
   const slideAnimationHandler = (winnerIndex) => {
     const correctIndex = winnerIndex;
     const incorrectIndex = 1 - winnerIndex;
   
     Animated.parallel([
       Animated.timing(slideAnimations[correctIndex], {
-        toValue: -500,
+        toValue: 500,
         duration: 400,
         easing: Easing.linear,
         useNativeDriver: true,
       }),
       Animated.timing(slideAnimations[incorrectIndex], {
-        toValue: 500,
+        toValue: -500,
         duration: 400,
         easing: Easing.linear,
         useNativeDriver: true,
@@ -39,7 +49,7 @@ const Rounds = ({ route }) => {
       handleCharacterSelect(winnerIndex);
     });
   };
-  
+
   const handleCharacterSelect = (winnerIndex) => {
     const nextRound = currentRound + 2;
     const remainingCharacters = selectedCharacters.filter(char => char !== currentPair[0] && char !== currentPair[1]);
@@ -48,6 +58,7 @@ const Rounds = ({ route }) => {
     
     if (remainingCharacters.length === 1) {
       setWinner(remainingCharacters[0]);
+      saveWinnerToStorage(remainingCharacters[0], gender);  // Save winner to local storage
     } else {
       setSelectedCharacters(remainingCharacters);
       setCurrentRound(nextRound);

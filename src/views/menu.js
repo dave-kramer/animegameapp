@@ -46,6 +46,10 @@ const Menu = ({ navigation }) => {
     navigation.navigate('Rounds', { gender: selectedGender, rounds });
   };
 
+  const handleScoresPress = () => {
+    navigation.navigate('Score');
+  };
+
   return (
     <ImageBackground source={require('../../assets/13.png')} style={styles.background}>
       <View style={styles.container}>
@@ -58,11 +62,11 @@ const Menu = ({ navigation }) => {
         <TouchableOpacity style={styles.menuItem} onPress={handleGenderPress}>
           <Text style={styles.menuText}>Who's the best?</Text>
         </TouchableOpacity>
+        <TouchableOpacity style={styles.menuItem} onPress={handleScoresPress}>
+          <Text style={styles.menuText}>Scores</Text>
+        </TouchableOpacity>
         <TouchableOpacity style={styles.menuItem} onPress={handleSettingsPress}>
           <Text style={styles.menuText}>Settings</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.menuItem}>
-          <Text style={styles.menuText}>Scores</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.menuItem}>
           <Text style={styles.menuText}>Rate us</Text>
