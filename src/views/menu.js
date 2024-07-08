@@ -4,6 +4,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Modal, ImageBackground } from
 const Menu = ({ navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [guessModalVisible, setGuessModalVisible] = useState(false);
+  const [genderModalVisible, setGenderModalVisible] = useState(false);
 
   const handleHigherOrLowerPress = () => {
     setModalVisible(true);
@@ -27,6 +28,24 @@ const Menu = ({ navigation }) => {
     navigation.navigate('Guess', { guessType: option });
   };
 
+  const handleGenderPress = () => {
+    setGenderModalVisible(true);
+  };
+
+  const handleGenderOptionPress = (gender) => {
+    setGenderModalVisible(false);
+    setRoundsModalVisible(true);
+    setSelectedGender(gender);
+  };
+
+  const [roundsModalVisible, setRoundsModalVisible] = useState(false);
+  const [selectedGender, setSelectedGender] = useState('');
+
+  const handleRoundsOptionPress = (rounds) => {
+    setRoundsModalVisible(false);
+    navigation.navigate('Rounds', { gender: selectedGender, rounds });
+  };
+
   return (
     <ImageBackground source={require('../../assets/13.png')} style={styles.background}>
       <View style={styles.container}>
@@ -35,6 +54,9 @@ const Menu = ({ navigation }) => {
         </TouchableOpacity>
         <TouchableOpacity style={styles.menuItem} onPress={handleGuessPress}>
           <Text style={styles.menuText}>Guess the ...</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.menuItem} onPress={handleGenderPress}>
+          <Text style={styles.menuText}>Rounds</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.menuItem} onPress={handleSettingsPress}>
           <Text style={styles.menuText}>Settings</Text>
@@ -46,6 +68,7 @@ const Menu = ({ navigation }) => {
           <Text style={styles.menuText}>Rate us</Text>
         </TouchableOpacity>
 
+        {/* Higher or Lower Modal */}
         <Modal
           transparent={true}
           visible={modalVisible}
@@ -95,6 +118,7 @@ const Menu = ({ navigation }) => {
           </View>
         </Modal>
 
+        {/* Guess Modal */}
         <Modal
           transparent={true}
           visible={guessModalVisible}
@@ -125,6 +149,82 @@ const Menu = ({ navigation }) => {
               <TouchableOpacity
                 style={styles.closeButton}
                 onPress={() => setGuessModalVisible(false)}
+              >
+                <Text style={styles.closeButtonText}>Close</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+
+        {/* Gender Modal */}
+        <Modal
+          transparent={true}
+          visible={genderModalVisible}
+          animationType="slide"
+          onRequestClose={() => setGenderModalVisible(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Choose Gender</Text>
+              <TouchableOpacity
+                style={styles.modalOption}
+                onPress={() => handleGenderOptionPress('Female')}
+              >
+                <Text style={styles.modalOptionText}>Female</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.modalOption}
+                onPress={() => handleGenderOptionPress('Male')}
+              >
+                <Text style={styles.modalOptionText}>Male</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => setGenderModalVisible(false)}
+              >
+                <Text style={styles.closeButtonText}>Close</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+
+        {/* Rounds Modal */}
+        <Modal
+          transparent={true}
+          visible={roundsModalVisible}
+          animationType="slide"
+          onRequestClose={() => setRoundsModalVisible(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Choose Rounds</Text>
+              <TouchableOpacity
+                style={styles.modalOption}
+                onPress={() => handleRoundsOptionPress(16)}
+              >
+                <Text style={styles.modalOptionText}>16 Rounds</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.modalOption}
+                onPress={() => handleRoundsOptionPress(32)}
+              >
+                <Text style={styles.modalOptionText}>32 Rounds</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.modalOption}
+                onPress={() => handleRoundsOptionPress(64)}
+              >
+                <Text style={styles.modalOptionText}>64 Rounds</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.modalOption}
+                onPress={() => handleRoundsOptionPress(128)}
+              >
+                <Text style={styles.modalOptionText}>128 Rounds</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => setRoundsModalVisible(false)}
               >
                 <Text style={styles.closeButtonText}>Close</Text>
               </TouchableOpacity>

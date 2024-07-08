@@ -6,6 +6,7 @@ import StartScreen from './src/views/startscreen';
 import Menu from './src/views/menu';
 import Game from './src/views/game';
 import Guess from './src/views/guess';
+import Rounds from './src/views/rounds';
 import Settings from './src/views/settings';
 
 const Stack = createStackNavigator();
@@ -18,6 +19,7 @@ const App = () => {
         <Stack.Screen name="Menu" component={Menu} options={{ headerShown: false }}/>
         <Stack.Screen name="Game" component={Game} options={{ headerShown: false }}/>
         <Stack.Screen name="Guess" component={Guess} options={{ headerShown: false }}/>
+        <Stack.Screen name="Rounds" component={Rounds} options={{ headerShown: false }}/>
         <Stack.Screen name="Settings" component={Settings} />
       </Stack.Navigator>
     </NavigationContainer>
