@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, Animated, Easing } from 'react-native';
 import characters from '../../assets/top_1000_char.json';
 
 const Rounds = ({ route }) => {
@@ -8,6 +8,7 @@ const Rounds = ({ route }) => {
   const [selectedCharacters, setSelectedCharacters] = useState([]);
   const [currentPair, setCurrentPair] = useState([null, null]);
   const [winner, setWinner] = useState(null);
+  const [slideAnimations, setSlideAnimations] = useState([new Animated.Value(0), new Animated.Value(0)]);
 
   useEffect(() => {
     const filteredCharacters = characters.filter(char => char.gender === gender);
@@ -17,16 +18,55 @@ const Rounds = ({ route }) => {
     setCurrentPair([selected[0], selected[1]]);
   }, [gender, rounds]);
 
-  const handleCharacterSelect = (winner) => {
+  const slideAnimationHandler = (winnerIndex) => {
+    const correctIndex = winnerIndex;
+    const incorrectIndex = 1 - winnerIndex;
+  
+    Animated.parallel([
+      Animated.timing(slideAnimations[correctIndex], {
+        toValue: -500,
+        duration: 400,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnimations[incorrectIndex], {
+        toValue: 500,
+        duration: 400,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      handleCharacterSelect(winnerIndex);
+    });
+  };
+  
+  const handleCharacterSelect = (winnerIndex) => {
     const nextRound = currentRound + 2;
     const remainingCharacters = selectedCharacters.filter(char => char !== currentPair[0] && char !== currentPair[1]);
+    const winner = currentPair[winnerIndex];
     remainingCharacters.push(winner);
+    
     if (remainingCharacters.length === 1) {
       setWinner(remainingCharacters[0]);
     } else {
       setSelectedCharacters(remainingCharacters);
       setCurrentRound(nextRound);
       setCurrentPair([remainingCharacters[0], remainingCharacters[1]]);
+      
+      Animated.parallel([
+        Animated.timing(slideAnimations[0], {
+          toValue: 0,
+          duration: 400,
+          easing: Easing.linear,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnimations[1], {
+          toValue: 0,
+          duration: 400,
+          easing: Easing.linear,
+          useNativeDriver: true,
+        }),
+      ]).start();
     }
   };
 
@@ -47,23 +87,27 @@ const Rounds = ({ route }) => {
   return (
     <View style={styles.container}>
       <View style={styles.topContainer}>
-        <TouchableOpacity onPress={() => handleCharacterSelect(currentPair[0])}>
-          <View style={styles.card}>
-            <Image source={{ uri: currentPair[0].image_url }} style={styles.characterImage} />
-          </View>
-        </TouchableOpacity>
+        <Animated.View style={{ transform: [{ translateX: slideAnimations[0] }] }}>
+          <TouchableOpacity onPress={() => slideAnimationHandler(0)}>
+            <View style={styles.card}>
+              <Image source={{ uri: currentPair[0].image_url }} style={styles.characterImage} />
+            </View>
+          </TouchableOpacity>
+        </Animated.View>
       </View>
       <View style={styles.middleContainer}>
-      <Text style={styles.name}>{currentPair[0].name}</Text>
+        <Text style={styles.name}>{currentPair[0].name}</Text>
         <Text style={styles.roundText}>Round {currentRound / 2 + 1}</Text>
         <Text style={styles.name}>{currentPair[1].name}</Text>
       </View>
       <View style={styles.bottomContainer}>
-        <TouchableOpacity onPress={() => handleCharacterSelect(currentPair[1])}>
-          <View style={styles.card}>
-            <Image source={{ uri: currentPair[1].image_url }} style={styles.characterImage} />
-          </View>
-        </TouchableOpacity>
+        <Animated.View style={{ transform: [{ translateX: slideAnimations[1] }] }}>
+          <TouchableOpacity onPress={() => slideAnimationHandler(1)}>
+            <View style={styles.card}>
+              <Image source={{ uri: currentPair[1].image_url }} style={styles.characterImage} />
+            </View>
+          </TouchableOpacity>
+        </Animated.View>
       </View>
     </View>
   );
@@ -124,7 +168,6 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 18,
     textAlign: 'center',
-
   },
   roundText: {
     fontSize: 24,

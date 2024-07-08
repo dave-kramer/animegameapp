@@ -56,7 +56,7 @@ const Menu = ({ navigation }) => {
           <Text style={styles.menuText}>Guess the ...</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.menuItem} onPress={handleGenderPress}>
-          <Text style={styles.menuText}>Rounds</Text>
+          <Text style={styles.menuText}>Who's the best?</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.menuItem} onPress={handleSettingsPress}>
           <Text style={styles.menuText}>Settings</Text>
@@ -170,13 +170,13 @@ const Menu = ({ navigation }) => {
                 style={styles.modalOption}
                 onPress={() => handleGenderOptionPress('Female')}
               >
-                <Text style={styles.modalOptionText}>Female</Text>
+                <Text style={styles.modalOptionText}>Best Female</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.modalOption}
                 onPress={() => handleGenderOptionPress('Male')}
               >
-                <Text style={styles.modalOptionText}>Male</Text>
+                <Text style={styles.modalOptionText}>Best Male</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.closeButton}
