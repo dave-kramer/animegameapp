@@ -22,6 +22,18 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      [
+        "expo-font",
+        {
+          "fonts": [
+            {
+              "asset": "./assets/fonts/akaDylan-Plain..ttf"
+            }
+          ]
+        }
+      ]
+    ]
   }
 }

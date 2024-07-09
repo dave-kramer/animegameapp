@@ -1,11 +1,21 @@
-import React from 'react';
-import { View, ImageBackground, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, ImageBackground, StyleSheet, TouchableOpacity, Text } from 'react-native';
 import * as Animatable from 'react-native-animatable';
+import { useFonts } from 'expo-font';
 
 const StartScreen = ({ navigation }) => {
+  const [loaded] = useFonts({
+    'akaDylan-Plain': require('../../assets/fonts/akaDylan-Plain.ttf'),
+  });
+
   const handlePress = () => {
     navigation.replace('Menu');
   };
+
+  // Check if the font is loaded
+  if (!loaded) {
+    return null; // You can return a loading indicator or null until the font is loaded
+  }
 
   return (
     <TouchableOpacity style={styles.container} onPress={handlePress}>
@@ -35,7 +45,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   text: {
-    fontSize: 28,
+    fontFamily: 'akaDylan-Plain',
+    fontSize: 26,
     color: 'white',
     textShadowColor: 'rgba(0, 0, 0, 0.75)',
     textShadowOffset: { width: -1, height: 1 },
